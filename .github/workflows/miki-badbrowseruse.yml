@@ -5,7 +5,8 @@ on:
     branches:
       - experiment/playwright-browser-20261110
     paths:
-      - "Miki-BadBrowserUse/**"
+      - "Miki-BadBrowserUse/src/**"
+      - "Miki-BadBrowserUse/package.json"
       - ".github/workflows/miki-badbrowseruse.yml"
   workflow_dispatch:
     inputs:

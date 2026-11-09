@@ -39,14 +39,14 @@ try {
       });
       result.httpStatus = response?.status() ?? null;
       result.title = await page.title();
-      result.finalUrl = page.url();
+      result.finalUrl = new URL(page.url()).origin + new URL(page.url()).pathname;
 
       if (id === "demo") {
         await page.locator('input[name="my-text"]').fill("Miki-BadBrowserUse public demo");
         await page.getByRole("button", { name: "Submit" }).click();
-        result.finalUrl = page.url();
+        result.finalUrl = new URL(page.url()).origin + new URL(page.url()).pathname;
         result.heading = await page.locator("h1").first().textContent({ timeout: 5000 }).catch(() => null);
-        result.formSubmitted = /received/i.test(result.heading ?? "");
+        result.formSubmitted = /form submitted|received/i.test(result.heading ?? "");
       } else {
         await page.waitForTimeout(1200);
         result.heading = await page.locator("h1").first().textContent({ timeout: 3500 }).catch(() => null);

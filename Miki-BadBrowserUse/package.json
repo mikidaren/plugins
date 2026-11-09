@@ -1,0 +1,16 @@
+{
+  "name": "miki-badbrowseruse",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Zero-browser-cloud-cost Playwright tasks dispatched through GitHub Actions",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "probe": "node src/probe.mjs"
+  },
+  "dependencies": {
+    "playwright": "1.56.1"
+  }
+}

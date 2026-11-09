@@ -1,0 +1,56 @@
+name: Miki-BadBrowserUse - browser tasks
+
+on:
+  push:
+    branches:
+      - experiment/playwright-browser-20261110
+    paths:
+      - "Miki-BadBrowserUse/**"
+      - ".github/workflows/miki-badbrowseruse.yml"
+  workflow_dispatch:
+    inputs:
+      target:
+        description: "Public browser probe; no account credentials"
+        type: choice
+        required: true
+        default: all
+        options:
+          - all
+          - demo
+          - azure
+          - oracle
+
+permissions:
+  contents: read
+
+concurrency:
+  group: miki-browser-probe-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  browser-probe:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      - name: Install dependencies and Chromium
+        working-directory: Miki-BadBrowserUse
+        run: |
+          npm install --ignore-scripts --no-audit --no-fund
+          npx playwright install --with-deps chromium
+      - name: Run public browser task
+        working-directory: Miki-BadBrowserUse
+        env:
+          BROWSER_TARGET: ${{ github.event.inputs.target || 'all' }}
+        run: npm run probe
+      - name: Upload sanitized screenshots and JSON
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: miki-browser-results
+          path: Miki-BadBrowserUse/artifacts/
+          if-no-files-found: warn
+          retention-days: 3

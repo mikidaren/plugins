@@ -1,0 +1,38 @@
+name: Playwright browser smoke test
+
+on:
+  push:
+    branches:
+      - experiment/playwright-browser-20261110
+    paths:
+      - .github/workflows/playwright-browser-smoke.yml
+      - experiments/browser-smoke/**
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  browser-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Install Playwright and Chromium
+        working-directory: experiments/browser-smoke
+        run: |
+          npm install --no-audit --no-fund
+          npx playwright install --with-deps chromium
+      - name: Visit public pages in headless Chromium
+        run: node experiments/browser-smoke/smoke.mjs
+      - name: Upload screenshots and results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-browser-smoke
+          path: artifacts/browser-smoke/
+          if-no-files-found: warn
+          retention-days: 7
